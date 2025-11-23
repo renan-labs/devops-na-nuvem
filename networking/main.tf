@@ -7,9 +7,9 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "not-so-simple-ecommerce-state-files-terraform"
-    key    = "networking/terraform.tfstate"
-    region = "us-east-1"
+    bucket         = "not-so-simple-ecommerce-state-files-terraform"
+    key            = "networking/terraform.tfstate"
+    region         = "us-east-1"
     dynamodb_table = "not-so-simple-ecommerce-terraform-state-locking"
   }
 }
