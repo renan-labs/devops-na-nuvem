@@ -15,6 +15,18 @@ variable "assume_role" {
   }
 }
 
+variable "tags" {
+  type = object({
+    Project     = string
+    Environment = string
+  })
+
+  default = {
+    Project     = "nsse",
+    Environment = "production"
+  }
+}
+
 variable "vpc" {
   type = object({
     name                     = string
