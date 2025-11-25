@@ -29,10 +29,14 @@ variable "tags" {
 
 variable "ec2_resources" {
   type = object({
-    key_pair_name = string
+    key_pair_name    = string
+    instance_profile = string
+    instance_role    = string
   })
 
   default = {
-    key_pair_name = "nsse-production-key-pair"
+    key_pair_name    = "nsse-production-key-pair"
+    instance_profile = "nsse-production-instance-role"
+    instance_role    = "nsse-production-instance-profile"
   }
 }
