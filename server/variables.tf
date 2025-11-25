@@ -36,7 +36,7 @@ variable "ec2_resources" {
 
   default = {
     key_pair_name    = "nsse-production-key-pair"
-    instance_profile = "nsse-production-instance-role"
-    instance_role    = "nsse-production-instance-profile"
+    instance_profile = "nsse-production-instance-profile"
+    instance_role    = "nsse-production-instance-role"
   }
 }
