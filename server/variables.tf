@@ -29,20 +29,20 @@ variable "tags" {
 
 variable "ec2_resources" {
   type = object({
-    key_pair_name    = string
-    instance_profile = string
-    instance_role    = string
+    key_pair_name      = string
+    instance_profile   = string
+    instance_role      = string
     ssh_security_group = string
-    ssh_source_ip = string
+    ssh_source_ip      = string
 
   })
 
   default = {
-    key_pair_name    = "nsse-production-key-pair"
-    instance_profile = "nsse-production-instance-profile"
-    instance_role    = "nsse-production-instance-role"
+    key_pair_name      = "nsse-production-key-pair"
+    instance_profile   = "nsse-production-instance-profile"
+    instance_role      = "nsse-production-instance-role"
     ssh_security_group = "allow-ssh"
-    ssh_source_ip = "193.186.4.203/32"
+    ssh_source_ip      = "193.186.4.203/32"
   }
 }
 
@@ -80,6 +80,34 @@ variable "vpc_resources" {
   })
 
   default = {
-    vpc = "nsse-vpc"
+    vpc = "nsse-production-vpc"
+  }
+}
+
+variable "control_plane_autos_scaling_group" {
+  type = object({
+    name                      = string
+    max_size                  = number
+    min_size                  = number
+    desired_capacity          = number
+    health_check_grace_period = number
+    health_check_type         = string
+    instance_maintenance_policy = object({
+      min_healthy_percentage = number
+      max_healthy_percentage = number
+    })
+  })
+
+  default = {
+    name                      = "nsse-production-control-plane-asg"
+    max_size                  = 1
+    min_size                  = 1
+    desired_capacity          = 1
+    health_check_grace_period = 100
+    health_check_type         = "EC2"
+    instance_maintenance_policy = {
+      min_healthy_percentage = 100
+      max_healthy_percentage = 110
+    }
   }
 }
