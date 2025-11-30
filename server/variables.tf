@@ -46,6 +46,34 @@ variable "ec2_resources" {
   }
 }
 
+variable "control_plane_launch_template" {
+  type = object({
+    name                                 = string
+    disable_api_stop                     = bool
+    disable_api_termination              = bool
+    instance_type                        = string
+    instance_initiated_shutdown_behavior = string
+    user_data                            = string
+    ebs = object({
+      size                  = number
+      delete_on_termination = bool
+    })
+  })
+
+  default = {
+    name                                 = "nsse-production-debian-control-plane-lt"
+    disable_api_stop                     = true
+    disable_api_termination              = true
+    instance_type                        = "t3.medium"
+    instance_initiated_shutdown_behavior = "terminate"
+    user_data                            = "./cli/control-plane-user-data.sh"
+    ebs = {
+      size                  = 20
+      delete_on_termination = true
+    }
+  }
+}
+
 variable "vpc_resources" {
   type = object({
     vpc = string
