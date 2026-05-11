@@ -1,0 +1,114 @@
+variable "region" {
+  default = "us-east-1"
+}
+
+variable "assume_role" {
+  type = object({
+    role_arn    = string
+    external_id = string
+  })
+
+  default = {
+    role_arn    = "arn:aws:iam::760023434898:role/terraform-role"
+    external_id = "de32345c-2ca9-43e9-b7b1-603db7316339"
+  }
+}
+
+variable "tags" {
+  type = object({
+    Project     = string
+    Environment = string
+  })
+
+  default = {
+    Project     = "not-so-simple-ecommerce"
+    Environment = "production"
+  }
+}
+
+variable "queues" {
+  type = list(object({
+    name                      = string
+    delay_seconds             = number
+    max_message_size          = number
+    message_retention_seconds = number
+    receive_wait_time_seconds = number
+    sqs_managed_sse_enabled   = bool
+  }))
+
+  default = [{
+    name                      = "EmailNotificationQueue"
+    delay_seconds             = 0
+    max_message_size          = 2048
+    message_retention_seconds = 86400
+    receive_wait_time_seconds = 1
+    sqs_managed_sse_enabled   = true
+    },
+    {
+      name                      = "ProductsStockQueue"
+      delay_seconds             = 0
+      max_message_size          = 2048
+      message_retention_seconds = 86400
+      receive_wait_time_seconds = 1
+      sqs_managed_sse_enabled   = true
+    },
+    {
+      name                      = "InvoiceQueue"
+      delay_seconds             = 0
+      max_message_size          = 2048
+      message_retention_seconds = 86400
+      receive_wait_time_seconds = 1
+      sqs_managed_sse_enabled   = true
+  }]
+}
+
+variable "dlqueues" {
+  type = list(object({
+    name                      = string
+    delay_seconds             = number
+    max_message_size          = number
+    message_retention_seconds = number
+    receive_wait_time_seconds = number
+    sqs_managed_sse_enabled   = bool
+  }))
+
+  default = [{
+    name                      = "EmailNotificationQueueDlq"
+    delay_seconds             = 0
+    max_message_size          = 2048
+    message_retention_seconds = 86400
+    receive_wait_time_seconds = 1
+    sqs_managed_sse_enabled   = true
+    },
+    {
+      name                      = "ProductsStockQueueDlq"
+      delay_seconds             = 0
+      max_message_size          = 2048
+      message_retention_seconds = 86400
+      receive_wait_time_seconds = 1
+      sqs_managed_sse_enabled   = true
+    },
+    {
+      name                      = "InvoiceQueue"
+      delay_seconds             = 0
+      max_message_size          = 2048
+      message_retention_seconds = 86400
+      receive_wait_time_seconds = 1
+      sqs_managed_sse_enabled   = true
+  }]
+}
+
+variable "order_confirmed_topic" {
+  type = object({
+    name                             = string
+    role_name                        = string
+    sqs_success_feedback_sample_rate = number
+    subscriptions                    = list(string)
+  })
+  default = {
+    name                             = "OrderConfirmedTopic"
+    role_name                        = "OrderConfirmedTopic"
+    sqs_success_feedback_sample_rate = 100
+    subscriptions                    = ["InvoiceQueue", "ProductsStockQueue"]
+  }
+}

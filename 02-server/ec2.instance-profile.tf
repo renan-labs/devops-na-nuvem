@@ -16,10 +16,8 @@ resource "aws_iam_instance_profile" "instance_profile" {
   role = aws_iam_role.instance_role.name
 }
 
-
-
 resource "aws_iam_role" "instance_role" {
-  name               = var.ec2_resources.instance_role
+  name = var.ec2_resources.instance_role
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   ]
