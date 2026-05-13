@@ -5,5 +5,7 @@ resource "aws_sns_topic" "order_confirmed_topic" {
   sqs_failure_feedback_role_arn    = aws_iam_role.sns_topic_role.arn
   policy                           = data.aws_iam_policy_document.sns_policy.json
 
+  depends_on = [aws_iam_role.sns_topic_role]
+
   tags = var.tags
 }

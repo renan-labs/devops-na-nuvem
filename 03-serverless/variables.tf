@@ -41,15 +41,15 @@ variable "queues" {
     delay_seconds             = 0
     max_message_size          = 2048
     message_retention_seconds = 86400
-    receive_wait_time_seconds = 1
+    receive_wait_time_seconds = 10
     sqs_managed_sse_enabled   = true
     },
     {
-      name                      = "ProductsStockQueue"
+      name                      = "ProductStockQueue"
       delay_seconds             = 0
       max_message_size          = 2048
       message_retention_seconds = 86400
-      receive_wait_time_seconds = 1
+      receive_wait_time_seconds = 10
       sqs_managed_sse_enabled   = true
     },
     {
@@ -57,7 +57,7 @@ variable "queues" {
       delay_seconds             = 0
       max_message_size          = 2048
       message_retention_seconds = 86400
-      receive_wait_time_seconds = 1
+      receive_wait_time_seconds = 10
       sqs_managed_sse_enabled   = true
   }]
 }
@@ -77,38 +77,39 @@ variable "dlqueues" {
     delay_seconds             = 0
     max_message_size          = 2048
     message_retention_seconds = 86400
-    receive_wait_time_seconds = 1
+    receive_wait_time_seconds = 10
     sqs_managed_sse_enabled   = true
     },
     {
-      name                      = "ProductsStockQueueDlq"
+      name                      = "ProductStockQueueDlq"
       delay_seconds             = 0
       max_message_size          = 2048
       message_retention_seconds = 86400
-      receive_wait_time_seconds = 1
+      receive_wait_time_seconds = 10
       sqs_managed_sse_enabled   = true
     },
     {
-      name                      = "InvoiceQueue"
+      name                      = "InvoiceQueueDlq"
       delay_seconds             = 0
       max_message_size          = 2048
       message_retention_seconds = 86400
-      receive_wait_time_seconds = 1
+      receive_wait_time_seconds = 10
       sqs_managed_sse_enabled   = true
   }]
 }
 
 variable "order_confirmed_topic" {
   type = object({
-    name                             = string
-    role_name                        = string
-    sqs_success_feedback_sample_rate = number
+    name                             = string,
+    role_name                        = string,
+    sqs_success_feedback_sample_rate = number,
     subscriptions                    = list(string)
   })
+
   default = {
+    role_name                        = "SnsTopicRole"
     name                             = "OrderConfirmedTopic"
-    role_name                        = "OrderConfirmedTopic"
-    sqs_success_feedback_sample_rate = 100
-    subscriptions                    = ["InvoiceQueue", "ProductsStockQueue"]
+    sqs_success_feedback_sample_rate = 100,
+    subscriptions                    = ["InvoiceQueue", "ProductStockQueue"]
   }
 }
