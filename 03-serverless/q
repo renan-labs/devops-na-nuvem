@@ -1,0 +1,481 @@
+PUBLISH()                                                            PUBLISH()
+
+
+
+[1mNAME[0m
+       publish -
+
+[1mDESCRIPTION[0m
+       Sends  a  message  to an Amazon SNS topic, a text message (SMS message)
+       directly to a phone number, or a message to a mobile platform  endpoint
+       (when you specify the [1mTargetArn [22m).
+
+       If  you  send  a message to a topic, Amazon SNS delivers the message to
+       each endpoint that is subscribed to the topic. The format of  the  mes-
+       sage depends on the notification protocol for each subscribed endpoint.
+
+       When a [1mmessageId [22mis returned, the message is saved and Amazon SNS imme-
+       diately delivers it to subscribers.
+
+       To  use  the  [1mPublish  [22maction for publishing a message to a mobile end-
+       point, such as an app on a Kindle device  or  mobile  phone,  you  must
+       specify the EndpointArn for the TargetArn parameter. The EndpointArn is
+       returned when making a call with the [1mCreatePlatformEndpoint [22maction.
+
+       For  more  information about formatting messages, see [4mSend[24m [4mCustom[24m [4mPlat-[0m
+       [4mform-Specific[24m [4mPayloads[24m [4min[24m [4mMessages[24m [4mto[24m [4mMobile[24m [4mDevices[24m .
+
+       [1mWARNING:[0m
+          You can publish messages only to topics and endpoints  in  the  same
+          Amazon Web Services Region.
+
+       See also: AWS API Documentation
+
+[1mSYNOPSIS[0m
+            publish
+          [--topic-arn <value>]
+          [--target-arn <value>]
+          [--phone-number <value>]
+          --message <value>
+          [--subject <value>]
+          [--message-structure <value>]
+          [--message-attributes <value>]
+          [--message-deduplication-id <value>]
+          [--message-group-id <value>]
+          [--cli-input-json | --cli-input-yaml]
+          [--generate-cli-skeleton <value>]
+          [--debug]
+          [--endpoint-url <value>]
+          [--no-verify-ssl]
+          [--no-paginate]
+          [--output <value>]
+          [--query <value>]
+          [--profile <value>]
+          [--region <value>]
+          [--version <value>]
+          [--color <value>]
+          [--no-sign-request]
+          [--ca-bundle <value>]
+          [--cli-read-timeout <value>]
+          [--cli-connect-timeout <value>]
+          [--cli-binary-format <value>]
+          [--no-cli-pager]
+          [--cli-auto-prompt]
+          [--no-cli-auto-prompt]
+          [--cli-error-format <value>]
+
+[1mOPTIONS[0m
+       [1m--topic-arn [22m(string)
+          The topic you want to publish to.
+
+          If  you  don't  specify a value for the [1mTopicArn [22mparameter, you must
+          specify a value for the [1mPhoneNumber [22mor [1mTargetArn [22mparameters.
+
+       [1m--target-arn [22m(string)
+          If you don't specify a value for the [1mTargetArn [22mparameter,  you  must
+          specify a value for the [1mPhoneNumber [22mor [1mTopicArn [22mparameters.
+
+       [1m--phone-number [22m(string)
+          The  phone  number  to which you want to deliver an SMS message. Use
+          E.164 format.
+
+          If you don't specify a value for the [1mPhoneNumber [22mparameter, you must
+          specify a value for the [1mTargetArn [22mor [1mTopicArn [22mparameters.
+
+       [1m--message [22m(string) [required]
+          The message you want to send.
+
+          If you are publishing to a topic and you want to send the same  mes-
+          sage  to all transport protocols, include the text of the message as
+          a String value. If you want to  send  different  messages  for  each
+          transport  protocol, set the value of the [1mMessageStructure [22mparameter
+          to [1mjson [22mand use a JSON object for the [1mMessage [22mparameter.
+
+          Constraints:
+
+          +o With the exception of SMS, messages must be UTF-8 encoded  strings
+            and  at  most  256  KB in size (262,144 bytes, not 262,144 charac-
+            ters).
+
+          +o For SMS, each message can contain up to 140 characters. This char-
+            acter limit depends on the encoding schema. For  example,  an  SMS
+            message  can  contain 160 GSM characters, 140 ASCII characters, or
+            70 UCS-2 characters. If you publish a message  that  exceeds  this
+            size  limit,  Amazon  SNS  sends the message as multiple messages,
+            each fitting within the  size  limit.  Messages  aren't  truncated
+            mid-word  but are cut off at whole-word boundaries. The total size
+            limit for a single SMS [1mPublish [22maction is 1,600 characters.
+
+          JSON-specific constraints:
+
+          +o Keys in the JSON object that  correspond  to  supported  transport
+            protocols must have simple JSON string values.
+
+          +o The values will be parsed (unescaped) before they are used in out-
+            going messages.
+
+          +o Outbound  notifications are JSON encoded (meaning that the charac-
+            ters will be reescaped for sending).
+
+          +o Values have a minimum length of 0 (the empty string,  "",  is  al-
+            lowed).
+
+          +o Values  have  a maximum length bounded by the overall message size
+            (so, including multiple protocols may limit message sizes).
+
+          +o Non-string values will cause the key to be ignored.
+
+          +o Keys that do not correspond to supported transport  protocols  are
+            ignored.
+
+          +o Duplicate keys are not allowed.
+
+          +o Failure  to parse or validate any key or value in the message will
+            cause the [1mPublish [22mcall to return an error (no partial delivery).
+
+       [1m--subject [22m(string)
+          Optional parameter to be used as the "Subject" line when the message
+          is delivered to email endpoints. This field will also  be  included,
+          if  present,  in  the standard JSON messages delivered to other end-
+          points.
+
+          Constraints: Subjects must be UTF-8 text with no line breaks or con-
+          trol characters, and less than 100 characters long.
+
+       [1m--message-structure [22m(string)
+          Set [1mMessageStructure [22mto [1mjson [22mif you want to send a different message
+          for each protocol. For example, using one publish  action,  you  can
+          send a short message to your SMS subscribers and a longer message to
+          your  email  subscribers.  If you set [1mMessageStructure [22mto [1mjson [22m, the
+          value of the [1mMessage [22mparameter must:
+
+          +o be a syntactically valid JSON object; and
+
+          +o contain at least a top-level JSON key of "default"  with  a  value
+            that is a string.
+
+          You can define other top-level keys that define the message you want
+          to send to a specific transport protocol (e.g., "http").
+
+          Valid value: [1mjson[0m
+
+       [1m--message-attributes [22m(map)
+          Message attributes for Publish action.
+
+          Name -> (string)
+
+          Value -> (structure)
+              The  user-specified  message  attribute  value.  For string data
+              types, the value attribute has the same restrictions on the con-
+              tent as the message body. For more information, see [4mPublish[24m .
+
+              Name, type, and value must not be empty or  null.  In  addition,
+              the  message  body should not be empty or null. All parts of the
+              message attribute, including name, type, and value, are included
+              in the message size  restriction,  which  is  currently  256  KB
+              (262,144  bytes).  For  more information, see [4mAmazon[24m [4mSNS[24m [4mmessage[0m
+              [4mattributes[24m and [4mPublishing[24m [4mto[24m [4ma[24m [4mmobile[24m [4mphone[24m in  the  [4mAmazon[24m  [4mSNS[0m
+              [4mDeveloper[24m [4mGuide.[0m
+
+              DataType -> (string) [required]
+                 Amazon SNS supports the following logical data types: String,
+                 String.Array,  Number,  and Binary. For more information, see
+                 [4mMessage[24m [4mAttribute[24m [4mData[24m [4mTypes[24m .
+
+              StringValue -> (string)
+                 Strings are Unicode with UTF8 binary encoding. For a list  of
+                 code values, see [4mASCII[24m [4mPrintable[24m [4mCharacters[24m .
+
+              BinaryValue -> (blob)
+                 Binary  type  attributes can store any binary data, for exam-
+                 ple, compressed data, encrypted data, or images.
+
+       Shorthand Syntax:
+
+          KeyName1={DataType=string,StringValue=string,BinaryValue=blob},KeyName2={DataType=string,StringValue=string,BinaryValue=blob}
+
+       JSON Syntax:
+
+          {"string": {
+                "DataType": "string",
+                "StringValue": "string",
+                "BinaryValue": blob
+              }
+            ...}
+
+       [1m--message-deduplication-id [22m(string)
+
+          +o This parameter applies only to FIFO  (first-in-first-out)  topics.
+            The  [1mMessageDeduplicationId  [22mcan  contain  up  to 128 alphanumeric
+            characters     [1m(a-z,      A-Z,      0-9)      [22mand      punctuation
+            [1m(!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~) [22m.
+
+          +o Every message must have a unique [1mMessageDeduplicationId [22m, which is
+            a  token  used  for  deduplication  of  sent messages within the 5
+            minute minimum deduplication interval.
+
+          +o The scope of deduplication depends on the [1mFifoThroughputScope  [22mat-
+            tribute,  when  set  to  [1mTopic  [22mthe message deduplication scope is
+            across the entire topic, when  set  to  [1mMessageGroup  [22mthe  message
+            deduplication scope is within each individual message group.
+
+          +o If a message with a particular [1mMessageDeduplicationId [22mis sent suc-
+            cessfully,  subsequent messages within the deduplication scope and
+            interval, with the same [1mMessageDeduplicationId [22m, are accepted suc-
+            cessfully but aren't delivered.
+
+          +o Every message must have a unique [1mMessageDeduplicationId [22m:
+
+            +o You may provide a [1mMessageDeduplicationId [22mexplicitly.
+
+            +o If you aren't able to provide a [1mMessageDeduplicationId  [22mand  you
+              enable [1mContentBasedDeduplication [22mfor your topic, Amazon SNS uses
+              a  SHA-256 hash to generate the [1mMessageDeduplicationId [22musing the
+              body of the message (but not the attributes of the message).
+
+            +o If you don't provide  a  [1mMessageDeduplicationId  [22mand  the  topic
+              doesn't  have  [1mContentBasedDeduplication  [22mset,  the action fails
+              with an error.
+
+            +o If the topic has a [1mContentBasedDeduplication [22mset, your [1mMessageD-[0m
+              [1meduplicationId [22moverrides the generated one.
+
+          +o When [1mContentBasedDeduplication [22mis in effect, messages with identi-
+            cal content sent within the deduplication scope and  interval  are
+            treated  as  duplicates and only one copy of the message is deliv-
+            ered.
+
+          +o If you send one message  with  [1mContentBasedDeduplication  [22menabled,
+            and then another message with a [1mMessageDeduplicationId [22mthat is the
+            same  as  the one generated for the first [1mMessageDeduplicationId [22m,
+            the two messages are treated as duplicates, within the  deduplica-
+            tion  scope  and interval, and only one copy of the message is de-
+            livered.
+
+       [1m--message-group-id [22m(string)
+          The [1mMessageGroupId [22mcan contain up  to  128  alphanumeric  characters
+          [1m(a-z, A-Z, 0-9) [22mand punctuation [1m(!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~) [22m.
+
+          For  FIFO  topics: The [1mMessageGroupId [22mis a tag that specifies that a
+          message belongs to a specific message group. Messages that belong to
+          the same message group are processed in a FIFO manner (however, mes-
+          sages in different message groups might be processed out of  order).
+          Every message must include a [1mMessageGroupId [22m.
+
+          For standard topics: The [1mMessageGroupId [22mis optional and is forwarded
+          only  to Amazon SQS standard subscriptions to activate [4mfair[24m [4mqueues[24m .
+          The [1mMessageGroupId [22mis not used for, or sent to, any  other  endpoint
+          types.  When  provided,  the same validation rules apply as for FIFO
+          topics.
+
+       [1m--cli-input-json [22m| [1m--cli-input-yaml [22m(string) Reads arguments  from  the
+       JSON  string  provided.  The JSON string follows the format provided by
+       [1m--generate-cli-skeleton[22m. If other arguments are provided on the command
+       line, those values will override the JSON-provided values.  It  is  not
+       possible to pass arbitrary binary values using a JSON-provided value as
+       the  string  will  be  taken literally. This may not be specified along
+       with [1m--cli-input-yaml[22m.
+
+       [1m--generate-cli-skeleton [22m(string) Prints a  JSON  skeleton  to  standard
+       output without sending an API request. If provided with no value or the
+       value [1minput[22m, prints a sample input JSON that can be used as an argument
+       for [1m--cli-input-json[22m. Similarly, if provided [1myaml-input [22mit will print a
+       sample  input  YAML that can be used with [1m--cli-input-yaml[22m. If provided
+       with the value [1moutput[22m, it validates the command inputs  and  returns  a
+       sample output JSON for that command. The generated JSON skeleton is not
+       stable  between versions of the AWS CLI and there are no backwards com-
+       patibility guarantees in the JSON skeleton generated.
+
+[1mGLOBAL OPTIONS[0m
+       [1m--debug [22m(boolean)
+
+       Turn on debug logging.
+
+       [1m--endpoint-url [22m(string)
+
+       Override command's default URL with the given URL.
+
+       [1m--no-verify-ssl [22m(boolean)
+
+       By default, the AWS CLI uses SSL when communicating with AWS  services.
+       For each SSL connection, the AWS CLI will verify SSL certificates. This
+       option overrides the default behavior of verifying SSL certificates.
+
+       [1m--no-paginate [22m(boolean)
+
+       Disable  automatic pagination. If automatic pagination is disabled, the
+       AWS CLI will only make one call, for the first page of results.
+
+       [1m--output [22m(string)
+
+       The formatting style for command output.
+
+       +o json
+
+       +o text
+
+       +o table
+
+       +o yaml
+
+       +o yaml-stream
+
+       +o off
+
+       [1m--query [22m(string)
+
+       A JMESPath query to use in filtering the response data.
+
+       [1m--profile [22m(string)
+
+       Use a specific profile from your credential file.
+
+       [1m--region [22m(string)
+
+       The region to use. Overrides config/env settings.
+
+       [1m--version [22m(string)
+
+       Display the version of this tool.
+
+       [1m--color [22m(string)
+
+       Turn on/off color output.
+
+       +o on
+
+       +o off
+
+       +o auto
+
+       [1m--no-sign-request [22m(boolean)
+
+       Do not sign requests. Credentials will not be loaded if  this  argument
+       is provided.
+
+       [1m--ca-bundle [22m(string)
+
+       The CA certificate bundle to use when verifying SSL certificates. Over-
+       rides config/env settings.
+
+       [1m--cli-read-timeout [22m(int)
+
+       The  maximum socket read time in seconds. If the value is set to 0, the
+       socket read will be blocking and not timeout. The default value  is  60
+       seconds.
+
+       [1m--cli-connect-timeout [22m(int)
+
+       The  maximum  socket connect time in seconds. If the value is set to 0,
+       the socket connect will be blocking and not timeout. The default  value
+       is 60 seconds.
+
+       [1m--cli-binary-format [22m(string)
+
+       The formatting style to be used for binary blobs. The default format is
+       base64.  The  base64  format  expects  binary blobs to be provided as a
+       base64 encoded string. The raw-in-base64-out format preserves  compati-
+       bility with AWS CLI V1 behavior and binary values must be passed liter-
+       ally.  When  providing  contents  from a file that map to a binary blob
+       [1mfileb:// [22mwill always be treated as binary and use the file contents di-
+       rectly regardless of the [1mcli-binary-format [22msetting. When using  [1mfile://[0m
+       the  file  contents  will need to properly formatted for the configured
+       [1mcli-binary-format[22m.
+
+       +o base64
+
+       +o raw-in-base64-out
+
+       [1m--no-cli-pager [22m(boolean)
+
+       Disable cli pager for output.
+
+       [1m--cli-auto-prompt [22m(boolean)
+
+       Automatically prompt for CLI input parameters.
+
+       [1m--no-cli-auto-prompt [22m(boolean)
+
+       Disable automatically prompt for CLI input parameters.
+
+       [1m--cli-error-format [22m(string)
+
+       The formatting style for error output. By default, errors are displayed
+       in enhanced format.
+
+       +o legacy
+
+       +o json
+
+       +o yaml
+
+       +o text
+
+       +o table
+
+       +o enhanced
+
+[1mEXAMPLES[0m
+       [1mNOTE:[0m
+          To use the following examples, you must have the AWS  CLI  installed
+          and  configured.  See  the [4mGetting[24m [4mstarted[24m [4mguide[24m in the [4mAWS[24m [4mCLI[24m [4mUser[0m
+          [4mGuide[24m for more information.
+
+          Unless otherwise  stated,  all  examples  have  unix-like  quotation
+          rules.  These  examples  will  need to be adapted to your terminal's
+          quoting rules. See [4mUsing[24m [4mquotation[24m [4mmarks[24m [4mwith[24m [4mstrings[24m in the [4mAWS[24m [4mCLI[0m
+          [4mUser[24m [4mGuide[24m .
+
+       [1mExample 1: To publish a message to a topic[0m
+
+       The following [1mpublish [22mexample publishes the specified  message  to  the
+       specified  SNS topic. The message comes from a text file, which enables
+       you to include line breaks.
+
+          aws sns publish \
+              --topic-arn "arn:aws:sns:us-west-2:123456789012:my-topic" \
+              --message file://message.txt
+
+       Contents of [1mmessage.txt[22m:
+
+          Hello World
+          Second Line
+
+       Output:
+
+          {
+              "MessageId": "123a45b6-7890-12c3-45d6-111122223333"
+          }
+
+       [1mExample 2: To publish an SMS message to a phone number[0m
+
+       The following [1mpublish [22mexample publishes the message [1mHello world! [22mto the
+       phone number [1m+1-555-555-0100[22m.
+
+          aws sns publish \
+              --message "Hello world!" \
+              --phone-number +1-555-555-0100
+
+       Output:
+
+          {
+              "MessageId": "123a45b6-7890-12c3-45d6-333322221111"
+          }
+
+[1mOUTPUT[0m
+       MessageId -> (string)
+          Unique identifier assigned to the published message.
+
+          Length Constraint: Maximum 100 characters
+
+       SequenceNumber -> (string)
+          This response element applies only to FIFO (first-in-first-out) top-
+          ics.
+
+          The sequence number is a large, non-consecutive number  that  Amazon
+          SNS  assigns  to  each  message. The length of [1mSequenceNumber [22mis 128
+          bits. [1mSequenceNumber [22mcontinues to increase for each [1mMessageGroupId [22m.
+
+
+
+                                                                     PUBLISH()

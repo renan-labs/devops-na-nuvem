@@ -9,7 +9,7 @@ variable "assume_role" {
   })
 
   default = {
-    role_arn    = "arn:aws:iam::760023434898:role/terraform-role"
+    role_arn    = "arn:aws:iam::250063289979:role/terraform-role"
     external_id = "de32345c-2ca9-43e9-b7b1-603db7316339"
   }
 }
@@ -112,4 +112,9 @@ variable "order_confirmed_topic" {
     sqs_success_feedback_sample_rate = 100,
     subscriptions                    = ["InvoiceQueue", "ProductStockQueue"]
   }
+}
+
+variable "s3_application_bucket_name" {
+  type    = string
+  default = "nsse-application-renan"
 }
