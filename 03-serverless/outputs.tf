@@ -13,3 +13,7 @@ output "sns_topic_arn" {
 output "s3_application_bucket_name" {
   value = aws_s3_bucket.nsse.bucket
 }
+
+output "rds_cluster_endpoint"{
+  value = aws_rds_cluster.this.endpoint
+}
