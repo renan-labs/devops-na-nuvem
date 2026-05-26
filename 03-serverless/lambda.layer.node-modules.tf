@@ -9,5 +9,5 @@ resource "aws_lambda_layer_version" "node_modules" {
   layer_name          = var.lambda_layer_node_modules.layer_name
   compatible_runtimes = var.lambda_layer_node_modules.compatible_runtimes
 
-  source_code_hash = data.archive_file.node_modules_layer.output_base64sha256
+  //source_code_hash = data.archive_file.node_modules_layer.output_base64sha256
 }
