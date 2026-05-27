@@ -285,3 +285,57 @@ variable "domain" {
   type    = string
   default = "cloudrenandias.com.br"
 }
+
+variable "document_db_cluster" {
+  type = object({
+    cluster_identifier              = string
+    database_name                   = string
+    s3_certificate_path             = string
+    engine                          = string
+    master_username                 = string
+    backup_retention_period         = number
+    preferred_backup_window         = string
+    preferred_maintenance_window    = string
+    final_snapshot_identifier       = string
+    storage_encrypted               = bool
+    availability_zones              = list(string)
+    enabled_cloudwatch_logs_exports = list(string)
+    subnet_group_name               = string
+    secret_name                     = string
+    instance_class                  = string
+    instance_identifier             = string
+    security_group_name             = string
+    parameter_group = object({
+      family     = string
+      name       = string
+      audit_logs = string
+      profiler   = string
+    })
+  })
+
+  default = {
+    cluster_identifier              = "nsse-documentdb-cluster"
+    database_name                   = "notSoSimpleEcommerce"
+    s3_certificate_path             = "app/documentdb-ca.pem"
+    engine                          = "docdb"
+    master_username                 = "nsse"
+    backup_retention_period         = 7
+    preferred_backup_window         = "01:00-02:00"
+    preferred_maintenance_window    = "sun:03:00-sun:04:00"
+    final_snapshot_identifier       = "nsse-documentdb-cluster-final-snapshot"
+    storage_encrypted               = true
+    availability_zones              = ["us-east-1a", "us-east-1b"]
+    enabled_cloudwatch_logs_exports = ["audit", "profiler"]
+    subnet_group_name               = "nsse-documentdb-subnet-group"
+    secret_name                     = "nsse-documentdb-secret"
+    instance_class                  = "db.t3.medium"
+    instance_identifier             = "nsse-document-db-cluster-single-instance"
+    security_group_name             = "nsse-documentdb-security-group"
+    parameter_group = {
+      family     = "docdb5.0"
+      name       = "nsse-documentdb-parameter-group"
+      audit_logs = "enabled"
+      profiler   = "enabled"
+    }
+  }
+}
