@@ -145,13 +145,14 @@ variable "security_groups" {
 
 variable "rds_aurora_cluster" {
   type = object({
-    cluster_identifier           = string
-    secret                       = string
-    engine                       = string
-    engine_mode                  = string
-    database_name                = string
-    master_username              = string
-    final_snapshot_identifier    = string
+    cluster_identifier = string
+    secret             = string
+    engine             = string
+    engine_mode        = string
+    database_name      = string
+    master_username    = string
+    //final_snapshot_identifier    = string
+    skip_final_snapshot          = bool
     preferred_maintenance_window = string
     availability_zones           = list(string)
     deletion_protection          = bool
@@ -169,13 +170,14 @@ variable "rds_aurora_cluster" {
   })
 
   default = {
-    cluster_identifier           = "nsse-aurora-serverless-cluster"
-    secret                       = "nsse-aurora-serverless-cluster-secret"
-    engine                       = "aurora-postgresql"
-    engine_mode                  = "provisioned"
-    database_name                = "notSoSimpleEcommerce"
-    master_username              = "nsseAdmin"
-    final_snapshot_identifier    = "nsse-aurora-serverless-cluster-final-snapshot"
+    cluster_identifier = "nsse-aurora-serverless-cluster"
+    secret             = "nsse-aurora-serverless-cluster-secret"
+    engine             = "aurora-postgresql"
+    engine_mode        = "provisioned"
+    database_name      = "notSoSimpleEcommerce"
+    master_username    = "nsseAdmin"
+    //final_snapshot_identifier    = "nsse-aurora-serverless-cluster-final-snapshot"
+    skip_final_snapshot          = true
     preferred_maintenance_window = "sun:05:00-sun:06:00"
     availability_zones           = ["us-east-1a", "us-east-1b"]
     deletion_protection          = false
@@ -261,6 +263,34 @@ variable "lambda_order_confirmed" {
   }
 }
 
+variable "lambda_report_job" {
+  type = object({
+    timeout       = number
+    package_type  = string
+    source_dir    = string
+    output_path   = string
+    filename      = string
+    function_name = string
+    handler       = string
+    runtime       = string
+    role_name     = string
+    policy_name   = string
+  })
+
+  default = {
+    timeout       = 30
+    package_type  = "zip"
+    source_dir    = "lambdas/report-job/build"
+    output_path   = "lambdas/report-job/outputs/package.zip"
+    filename      = "lambdas/report-job/outputs/package.zip"
+    function_name = "reportJobLambdaFunction"
+    handler       = "index.handler"
+    runtime       = "nodejs18.x"
+    role_name     = "nsse-production-report-job-lambda-role"
+    policy_name   = "nsse-production-report-job-lambda-policy"
+  }
+}
+
 variable "lambda_layer_node_modules" {
   type = object({
     package_type        = string
@@ -288,15 +318,16 @@ variable "domain" {
 
 variable "document_db_cluster" {
   type = object({
-    cluster_identifier              = string
-    database_name                   = string
-    s3_certificate_path             = string
-    engine                          = string
-    master_username                 = string
-    backup_retention_period         = number
-    preferred_backup_window         = string
-    preferred_maintenance_window    = string
-    final_snapshot_identifier       = string
+    cluster_identifier           = string
+    database_name                = string
+    s3_certificate_path          = string
+    engine                       = string
+    master_username              = string
+    backup_retention_period      = number
+    preferred_backup_window      = string
+    preferred_maintenance_window = string
+    //final_snapshot_identifier       = string
+    skip_final_snapshot             = bool
     storage_encrypted               = bool
     availability_zones              = list(string)
     enabled_cloudwatch_logs_exports = list(string)
@@ -314,15 +345,16 @@ variable "document_db_cluster" {
   })
 
   default = {
-    cluster_identifier              = "nsse-documentdb-cluster"
-    database_name                   = "notSoSimpleEcommerce"
-    s3_certificate_path             = "app/documentdb-ca.pem"
-    engine                          = "docdb"
-    master_username                 = "nsse"
-    backup_retention_period         = 7
-    preferred_backup_window         = "01:00-02:00"
-    preferred_maintenance_window    = "sun:03:00-sun:04:00"
-    final_snapshot_identifier       = "nsse-documentdb-cluster-final-snapshot"
+    cluster_identifier           = "nsse-documentdb-cluster"
+    database_name                = "notSoSimpleEcommerce"
+    s3_certificate_path          = "app/documentdb-ca.pem"
+    engine                       = "docdb"
+    master_username              = "nsse"
+    backup_retention_period      = 0
+    preferred_backup_window      = "01:00-02:00"
+    preferred_maintenance_window = "sun:03:00-sun:04:00"
+    //final_snapshot_identifier       = "nsse-documentdb-cluster-final-snapshot"
+    skip_final_snapshot             = true
     storage_encrypted               = true
     availability_zones              = ["us-east-1a", "us-east-1b"]
     enabled_cloudwatch_logs_exports = ["audit", "profiler"]
@@ -337,5 +369,25 @@ variable "document_db_cluster" {
       audit_logs = "enabled"
       profiler   = "enabled"
     }
+  }
+}
+
+variable "event_bridge_scheduler_lambda_report_job" {
+  type = object({
+    schedule_name                 = string
+    schedule_group_name           = string
+    schedule_flexible_time_window = string
+    schedule_expression           = string
+    role_name                     = string
+    policy_name                   = string
+  })
+
+  default = {
+    schedule_name                 = "lambda-report-schedule"
+    schedule_group_name           = "default"
+    schedule_flexible_time_window = "OFF"
+    schedule_expression           = "rate(1 minutes)"
+    role_name                     = "nsse-production-eb-scheduler-role"
+    policy_name                   = "nsse-production-invoke-lambda-policy"
   }
 }
