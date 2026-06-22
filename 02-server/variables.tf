@@ -73,7 +73,7 @@ variable "control_plane_launch_template" {
     name                                 = "nsse-production-debian-control-plane"
     disable_api_stop                     = true
     disable_api_termination              = true
-    instance_type                        = "t3.micro"
+    instance_type                        = "t3.medium"
     instance_initiated_shutdown_behavior = "terminate"
     user_data                            = "./cli/control-plane-user-data.sh"
     ebs = {
@@ -102,7 +102,7 @@ variable "worker_launch_template" {
     name                                 = "nsse-production-debian-worker"
     disable_api_stop                     = true
     disable_api_termination              = true
-    instance_type                        = "t3.micro"
+    instance_type                        = "t3.medium"
     instance_initiated_shutdown_behavior = "terminate"
     user_data                            = "./cli/worker-user-data.sh"
     ebs = {
@@ -131,9 +131,9 @@ variable "control_plane_auto_scaling_group" {
 
   default = {
     name                      = "nsse-production-control-plane-asg"
-    max_size                  = 1
-    min_size                  = 1
-    desired_capacity          = 1
+    max_size                  = 2
+    min_size                  = 2
+    desired_capacity          = 2
     health_check_grace_period = 180
     health_check_type         = "EC2"
     instance_tags = {
@@ -165,9 +165,9 @@ variable "worker_auto_scaling_group" {
 
   default = {
     name                      = "nsse-production-worker-asg"
-    max_size                  = 1
-    min_size                  = 1
-    desired_capacity          = 1
+    max_size                  = 2
+    min_size                  = 2
+    desired_capacity          = 2
     health_check_grace_period = 180
     health_check_type         = "EC2"
     instance_tags = {
@@ -274,5 +274,46 @@ variable "logs_bucket" {
   default = {
     bucket = "nsse-production-patching-logs-10"
     force_destroy = true
+  }
+}
+
+variable "bucket_ssm" {
+  type = string
+  default = "nsse-ansible-ssm-10"
+}
+
+variable "network_load_balancer" {
+  type = object({
+    name               = string
+    internal           = bool
+    load_balancer_type = string
+    default_tg = object({
+      name               = string
+      target_type        = string
+      port               = number
+      protocol           = string
+      preserve_client_ip = bool
+    })
+    default_listener = object({
+      port     = number
+      protocol = string
+    })
+  })
+
+  default = {
+    name               = "nsse-production-cp-nlb"
+    internal           = true
+    load_balancer_type = "network"
+    default_tg = {
+      name               = "nsse-production-cp-nlb-tcp-tg"
+      target_type        = "instance"
+      port               = 6443
+      protocol           = "TCP"
+      preserve_client_ip = false
+    }
+    default_listener = {
+      port     = 6443
+      protocol = "TCP"
+    }
   }
 }

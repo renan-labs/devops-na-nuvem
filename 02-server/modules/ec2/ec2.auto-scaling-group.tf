@@ -1,5 +1,5 @@
 locals {
-  asg_tags_dictionary = [ for key, value in var.auto_scaling_group.instance_tags : {
+  asg_tags_dictionary = [for key, value in var.auto_scaling_group.instance_tags : {
     key   = key
     value = value
   }]
@@ -12,9 +12,8 @@ resource "aws_autoscaling_group" "this" {
   desired_capacity          = var.auto_scaling_group.desired_capacity
   health_check_grace_period = var.auto_scaling_group.health_check_grace_period
   health_check_type         = var.auto_scaling_group.health_check_type
-  #vpc_zone_identifier       = data.aws_subnets.private_subnets.ids
   vpc_zone_identifier       = var.auto_scaling_group.vpc_zone_identifier
-
+  target_group_arns         = var.auto_scaling_group.target_group_arns
   launch_template {
     name    = aws_launch_template.this.name
     version = "$Latest"
@@ -25,6 +24,9 @@ resource "aws_autoscaling_group" "this" {
     max_healthy_percentage = var.auto_scaling_group.instance_maintenance_policy.max_healthy_percentage
   }
 
+  // Optional
+  suspended_processes = ["AZRebalance"]
+
   dynamic "tag" {
     for_each = local.asg_tags_dictionary
     content {
@@ -33,21 +35,4 @@ resource "aws_autoscaling_group" "this" {
       propagate_at_launch = true
     }
   }
-
- /* tag {
-    key                 = "Name"
-    value               = var.tags.Project
-    propagate_at_launch = true
-  }
-  tag {
-    key                 = "Environment"
-    value               = var.tags.Environment
-    propagate_at_launch = true
-  }
-
-    tag {
-    key                 = "Patch Group"
-    value               = "Production"
-    propagate_at_launch = true
-  }*/
 }
